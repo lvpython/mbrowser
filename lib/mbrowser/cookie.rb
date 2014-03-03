@@ -14,7 +14,6 @@ module Mbrowser
 
 			def export_cookies domain
 				load_cookie_from_disk if $session_cookies.empty?
-				puts "current_cookie:" + $session_cookies.inspect
 				cookie_store = $session_cookies.select{ |suffix_domain,value| domain.include? suffix_domain}.inject({}){|m,n| m.merge!(n[1]);m}
 				cookies_str = cookie_store.clone.keys.map{ |key|
 				 "#{cookie_store[key].empty? ? "" : "#{key}=#{cookie_store[key]};"}"
@@ -26,7 +25,6 @@ module Mbrowser
 
 				headers= curl.header_str.split("\r\n").map{|v| v.split(":")}.select{|item| item[0].downcase=="set-cookie"}
 				cookie_hashs = headers.map{|v| v[1].split("; ")}.reduce(:+).map{|v| v.split("=")}.inject({}){|m,item| m.merge!({item[0].strip.to_sym=>item[1].to_s});m}
-				puts cookie_hashs.inspect
 				return unless cookie_hashs.is_a? Hash
 				domain = cookie_hashs[:domain]
 				cookie_hashs.delete(:domain)
