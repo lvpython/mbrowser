@@ -10,6 +10,7 @@ module Mbrowser
   	METHOD_GROUPS = ["get", "post", "put", "delete"]
     HTML = "html"
     JSON = "json"
+    attr_accessor :curl
 
   	def initialize(attrs = {})
   		super(attrs)
@@ -17,17 +18,17 @@ module Mbrowser
   		@payload = attrs[:payload] || {}
       @pretty_response = ""
   		raise "unsupport method #{@method}" unless METHOD_GROUPS.include? @method
-  		
   	end
 
   	def open
   		unless @payload.empty?
         post_data = @payload.map{|key,value| "#{encode_data(key)}=#{encode_data(value)}"}.join("&")
-  			@curl.send("http_#{@method}", post_data)
-  		else
-  			@curl.send("http_#{@method}")
+          @curl.send("http_#{@method}", post_data)
+    		else
+  			 @curl.send("http_#{@method}")
   		end
   		Mbrowser::Cookie.import_cookies @curl
+      self
   	end
 
   	def response_code
@@ -40,8 +41,12 @@ module Mbrowser
 
   	def body_str
       if @is_gzip
-  		  gz = Zlib::GzipReader.new(StringIO.new(@curl.body_str))    
-        responses = gz.read
+        begin
+    		  gz = Zlib::GzipReader.new(StringIO.new(@curl.body_str))    
+          responses = gz.read
+        rescue
+          @curl.body_str
+        end
       else
         @curl.body_str
       end

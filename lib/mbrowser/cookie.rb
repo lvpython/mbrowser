@@ -9,7 +9,7 @@ module Mbrowser
   		end
 
   		def dump_cookie_to_file
-  			File.open(COOKIE_FILE, 'w') {|f| f.write $session_cookies.to_yaml }
+  			File.open(COOKIE_FILE, 'w') {|f| f.write $session_cookies.to_yaml } 
   		end
 
 			def export_cookies domain
@@ -22,19 +22,22 @@ module Mbrowser
 			end
 
 			def import_cookies curl
-
-				headers= curl.header_str.split("\r\n").map{|v| v.split(":")}.select{|item| item[0].downcase=="set-cookie"}
-				cookie_hashs = headers.map{|v| v[1].split("; ")}.reduce(:+).map{|v| v.split("=")}.inject({}){|m,item| m.merge!({item[0].strip.to_sym=>item[1].to_s});m}
-				return unless cookie_hashs.is_a? Hash
-				domain = cookie_hashs[:domain]
-				cookie_hashs.delete(:domain)
-			  cookie_hashs.delete(:expires)
-			  cookie_hashs.delete(:path)
-			  cookie_hashs.delete(:HttpOnly)
-			  $session_cookies[domain] ||= {}
-			  cookie_hashs.each do |key,value|
-			    $session_cookies[domain][key] = value.to_s
-			  end
+				cookie_headers= curl.header_str.split("\r\n").map{|v|  v if v =~ /^Set-Cookie:.*/ }.compact
+				
+				cookie_hashs = cookie_headers.map do |v| 
+					v = v[11..-1]
+					cookie_hash = v.split(";").inject({}){|m,item| m.merge!({item.split("=")[0].strip.to_sym=>item.split("=")[1..-1].join("=").to_s});m}
+					domain = cookie_hash[:domain]
+					domain ||= curl.domain
+					cookie_hash.delete(:domain)
+				  cookie_hash.delete(:expires)
+				  cookie_hash.delete(:path)
+				  cookie_hash.delete(:HttpOnly)
+				  $session_cookies[domain] ||= {}
+				  cookie_hash.each do |key,value|
+				    $session_cookies[domain][key] = value.to_s
+				  end
+				end
 			  dump_cookie_to_file
 			end
 		end
