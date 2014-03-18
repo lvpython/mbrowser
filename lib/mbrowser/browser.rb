@@ -16,7 +16,7 @@ module Mbrowser
   		super(attrs)
   		@method = attrs[:method]
   		@payload = attrs[:payload] || {}
-      @pretty_response = ""
+      @_response = ""
   		raise "unsupport method #{@method}" unless METHOD_GROUPS.include? @method
   	end
 
@@ -54,17 +54,15 @@ module Mbrowser
 
     def formatted_response format = HTML
       if format == JSON
-        @pretty_response = JSON.parse(body_str)
+        @_response = JSON.parse(body_str)
       elsif format == HTML
-        @pretty_response = Nokogiri::HTML(body_str)
+        @_response = Nokogiri::HTML(body_str)
       end
     end
 
-    def pretty_response format = HTML
-      if @pretty_response.is_a? String
-        formatted_response format
-      end
-      @pretty_response
+    def pretty_response format = HTML      
+      formatted_response format
+      @_response
     end
 
     private      

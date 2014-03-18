@@ -35,7 +35,11 @@ module Mbrowser
 				  cookie_hash.delete(:HttpOnly)
 				  $session_cookies[domain] ||= {}
 				  cookie_hash.each do |key,value|
-				    $session_cookies[domain][key] = value.to_s
+				  	if value.to_s.downcase.strip != "deleted"
+							$session_cookies[domain][key] = value.to_s
+				  	else
+							$session_cookies[domain].delete key
+				  	end
 				  end
 				end
 			  dump_cookie_to_file
