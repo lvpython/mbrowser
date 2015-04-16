@@ -1,0 +1,23 @@
+AllCops:
+  Exclude:
+    - bin/*
+    - 'vendor/**/*'
+    - 'lib/tasks/*.rake'
+    - app/helpers/bootstrap/*
+    - lib/query/query_engine.rb
+    - lib/api/topos/traffic_strategies/api.rb
+Metrics/LineLength:
+  Max: 128
+Documentation:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Enabled: false
+Style/ClassVars:
+  Enabled: false
+Metrics/ClassLength:
+  Max: 300
+Metrics/MethodLength:
+  CountComments: false
+  Max: 15

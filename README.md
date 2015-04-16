@@ -18,7 +18,8 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Ex.
+Mbrowser::Browser.new(method: 'get', url: 'https://apps.yottaa.com')
 
 ## Contributing
 
